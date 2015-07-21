@@ -196,8 +196,13 @@ class CumulusStorage(Auth, Storage):
         if path and not path.endswith("/"):
             path = u"{0}/".format(path)
         path_len = len(path)
-        for name in [x["name"] for x in
-                     self.connection.get_container(self.container_name, full_listing=True)[1]]:
+        try:
+            names = [x["name"] for x in
+                     self.connection.get_container(self.container_name, full_listing=True, prefix=path)[1]]
+        except Exception:
+            names = [x.name for x in self.container.list_all(prefix=path)]
+
+        for name in names:
             files.append(name[path_len:])
         return ([], files)
 
@@ -212,8 +217,13 @@ class CumulusStorage(Auth, Storage):
         if path and not path.endswith("/"):
             path = u"{0}/".format(path)
         path_len = len(path)
-        for name in [x["name"] for x in
-                     self.connection.get_container(self.container_name, full_listing=True)[1]]:
+        try:
+            names = [x["name"] for x in
+                     self.connection.get_container(self.container_name, full_listing=True, prefix=path)[1]]
+        except Exception:
+            names = [x.name for x in self.container.list_all(prefix=path)]
+
+        for name in names:
             name = name[path_len:]
             slash = name[1:-1].find("/") + 1
             if slash:
